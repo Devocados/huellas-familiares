@@ -1,6 +1,7 @@
 "use client";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { FamilyCard } from "./familyCard";
+import Xarrow,{ Xwrapper } from "react-xarrows";
 
 interface FamilyMember {
   id: string;
@@ -10,18 +11,17 @@ interface FamilyMember {
   image?: string;
   dob: string;
   dod?: string;
-  spouse?: {
-    id: string;
-    firstName: string;
-    lastName: string;
-    relation: string;
-    dob: string;
-    dod?: string;
-    image?:string;
-  };
+  spouse?: Spouse;
   children: FamilyMember[];
 }
-
+export interface Spouse {
+  firstName: string;
+  lastName: string;
+  relation: string;
+  dob: string;
+  image?: string;
+  dod?: string;
+}
 export const FamilyTree: React.FC = () => {
   const [familyMembers, setFamilyMembers] = useState<FamilyMember>({
     id: "1",
@@ -31,7 +31,6 @@ export const FamilyTree: React.FC = () => {
     dob: "1980-01-01",
     dod: "",
     spouse: {
-        id: "12",
       firstName: "Isabella",
       lastName: "Santos",
       relation: "Spouse",
@@ -47,7 +46,6 @@ export const FamilyTree: React.FC = () => {
         dob: "2005-06-15",
         dod: "",
         spouse: {
-         id: "13",
           firstName: "Camila",
           lastName: "Gomez",
           relation: "Spouse",
@@ -92,7 +90,6 @@ export const FamilyTree: React.FC = () => {
         dob: "2007-08-05",
         dod: "",
         spouse: {
-            id: "14",
           firstName: "Lucia",
           lastName: "Lopez",
           relation: "Spouse",
@@ -140,6 +137,9 @@ export const FamilyTree: React.FC = () => {
       },
     ],
   });
+   const refs: { [key: string]: React.RefObject<HTMLDivElement> } = {};
+  const [, setRender] = useState({});
+  const forceRerender = () => setRender({});
   const handleDrop = (droppedId: string, onId: string) => {
     const updatedMembers = updateFamilyTree(familyMembers, droppedId, onId);
 
@@ -165,10 +165,10 @@ export const FamilyTree: React.FC = () => {
       }
       const updatedDroppedMember = { ...droppedMember };
 
-    targetMember.children = [
-      ...(targetMember.children || []),
-      { ...droppedMember, spouse: undefined }, 
-    ];
+      targetMember.children = [
+        ...(targetMember.children || []),
+        { ...droppedMember },
+      ];
     }
     return updatedMembers;
   };
@@ -196,8 +196,12 @@ export const FamilyTree: React.FC = () => {
     }
     return null;
   };
-
+ const getOrCreateRef = (id: string) => {
+   if (!refs[id]) refs[id] = useRef<HTMLDivElement>(null);
+   return refs[id];
+ };
   const renderFamilyTree = (member: FamilyMember) => {
+   const parentRef = getOrCreateRef(member.id);
     return (
       <div
         key={member.id}
@@ -207,9 +211,13 @@ export const FamilyTree: React.FC = () => {
           flexDirection: "column",
           alignItems: "center",
           margin: "20px",
+          position:"relative"
         }}
       >
-        <div style={{ display: "flex", justifyContent: "center" }}>
+        <div
+          ref={parentRef}
+          style={{ display: "flex", justifyContent: "center" }}
+        >
           <FamilyCard
             id={member.id}
             firstName={member.firstName}
@@ -219,19 +227,8 @@ export const FamilyTree: React.FC = () => {
             dob={member.dob}
             dod={member.dod}
             image={member.image}
+            spouse={member.spouse}
           />
-          {member.spouse && (
-            <FamilyCard
-              id={member.spouse.id}
-              firstName={member.spouse.firstName}
-              lastName={member.spouse.lastName}
-              relation={member.spouse.relation}
-              onDrop={handleDrop}
-              dob={member.spouse.dob}
-              dod={member.spouse.dod}
-              image={member.spouse.image}
-            />
-          )}
         </div>
 
         {member.children && member.children.length > 0 && (
@@ -242,19 +239,24 @@ export const FamilyTree: React.FC = () => {
               marginTop: "20px",
             }}
           >
-            {member.children.map((child) => (
-              <div key={child.id} style={{ position: "relative" }}>
-                {renderFamilyTree(child)}
-
-                {/* Draw line between parent and child */}
-                {/* <Xarrow
-                  start={member.id} 
-                  end={child.id}
-                  color="blue" 
-                  strokeWidth={2} 
-                /> */}
-              </div>
-            ))}
+            {member.children.map((child) => {
+              const childRef = getOrCreateRef(child.id);
+              return (
+                <div key={child.id} style={{ position: "relative" }}>
+                  {renderFamilyTree(child)}
+                  {/* Draw arrows between parent and child */}
+                  {/* <Xarrow
+                    start={member.id} // Parent
+                    end={child.id} // Child
+                    startAnchor="top"
+                    endAnchor="bottom"
+                    path="smooth"
+                    color="blue"
+                    strokeWidth={2}
+                  /> */}
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
