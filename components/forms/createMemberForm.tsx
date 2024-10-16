@@ -1,20 +1,192 @@
-import React from "react";
+"use client";
+import React, { useState } from "react";
+import { FamilyMember } from "../familyCards/familyTree";
 
 const CreateMemberForm = () => {
+  const [familyMembers, setFamilyMembers] = useState<FamilyMember>({
+    id: "1",
+    firstName: "Manuel",
+    lastName: "Santos",
+    relation: "Parent",
+    dob: "1980-01-01",
+    dod: "",
+    spouse: {
+      firstName: "Isabella",
+      lastName: "Santos",
+      relation: "Spouse",
+      dob: "1982-02-14",
+      dod: "",
+    },
+    children: [
+      {
+        id: "8",
+        firstName: "Diego",
+        lastName: "Santos",
+        relation: "Child",
+        dob: "2005-06-15",
+        dod: "",
+        spouse: {
+          firstName: "Camila",
+          lastName: "Gomez",
+          relation: "Spouse",
+          dob: "2006-07-20",
+          dod: "",
+        },
+        children: [
+          {
+            id: "9",
+            firstName: "Sofia",
+            lastName: "Santos",
+            relation: "Grandchild",
+            dob: "2020-01-10",
+            dod: "",
+            children: [],
+          },
+          {
+            id: "10",
+            firstName: "Mateo",
+            lastName: "Santos",
+            relation: "Grandchild",
+            dob: "2020-02-20",
+            dod: "",
+            children: [],
+          },
+          {
+            id: "11",
+            firstName: "Valentina",
+            lastName: "Santos",
+            relation: "Grandchild",
+            dob: "2020-03-30",
+            dod: "",
+            children: [],
+          },
+        ],
+      },
+      {
+        id: "2",
+        firstName: "Alejandro",
+        lastName: "Santos",
+        relation: "Child",
+        dob: "2007-08-05",
+        dod: "",
+        spouse: {
+          firstName: "Lucia",
+          lastName: "Lopez",
+          relation: "Spouse",
+          dob: "2008-09-10",
+          dod: "",
+        },
+        children: [],
+      },
+      {
+        id: "3",
+        firstName: "Carmen",
+        lastName: "Santos",
+        relation: "Child",
+        dob: "2010-09-12",
+        dod: "",
+        children: [
+          {
+            id: "4",
+            firstName: "Nicolas",
+            lastName: "Santos",
+            relation: "Grandchild",
+            dob: "2015-04-15",
+            dod: "",
+            children: [],
+          },
+          {
+            id: "5",
+            firstName: "Renata",
+            lastName: "Santos",
+            relation: "Grandchild",
+            dob: "2016-05-25",
+            dod: "",
+            children: [],
+          },
+          {
+            id: "6",
+            firstName: "Diego",
+            lastName: "Santos",
+            relation: "Grandchild",
+            dob: "2017-06-30",
+            dod: "",
+            children: [],
+          },
+        ],
+      },
+    ],
+  });
+
+  const [formData, setFormData] = useState({
+    parentId: "",
+    firstName: "",
+    lastName: "",
+    dob: "",
+    dod: "",
+    hasSpouse: false,
+    spouseName: "",
+    spouseDob: "",
+    spouseDod: "",
+  });
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value, type } = e.target;
+
+    if (type === "checkbox" || type === "radio") {
+      setFormData({
+        ...formData,
+        [name]: (e.target as HTMLInputElement).checked,
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value,
+      });
+    }
+  };
+
+  const getAllFamilyMembers = (members: FamilyMember): FamilyMember[] => {
+    let allMembers: FamilyMember[] = [];
+
+    const addMemberToList = (member: FamilyMember) => {
+      allMembers.push(member);
+
+      member.children.forEach((child) => {
+        addMemberToList(child);
+      });
+    };
+    addMemberToList(members);
+
+    return allMembers;
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+  };
+  const allFamilyMembers = getAllFamilyMembers(familyMembers);
   return (
     <div className="flex justify-center items-center min-h-screen">
-      <form className="max-w-sm w-full ">
+      <form onSubmit={handleSubmit} className="max-w-sm w-full">
         <div className="mb-5">
           <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-            Your Name
+            Select Parent
           </label>
-          <input
-            type="text"
-            id="yourName"
+          <select
+            name="parentId"
+            value={formData.parentId}
+            onChange={handleChange}
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            placeholder="name@email.com"
             required
-          />
+          >
+            <option value="">-- Select Parent --</option>
+            {allFamilyMembers.map((member) => (
+              <option key={member.id} value={member.id}>
+                {member.firstName} {member.lastName}
+              </option>
+            ))}
+          </select>
         </div>
         <div className="mb-5">
           <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
@@ -22,7 +194,9 @@ const CreateMemberForm = () => {
           </label>
           <input
             type="text"
-            id="memberName"
+            name="firstName"
+            value={formData.firstName}
+            onChange={handleChange}
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             required
           />
@@ -33,26 +207,105 @@ const CreateMemberForm = () => {
           </label>
           <input
             type="date"
-            id="memberDob"
+            name="dob"
+            value={formData.dob}
+            onChange={handleChange}
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             required
+          />
+        </div>
+        \{" "}
+        <div className="mb-5">
+          <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+            Family Member DOD (optional)
+          </label>
+          <input
+            type="date"
+            name="dod"
+            value={formData.dod}
+            onChange={handleChange}
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           />
         </div>
         <div className="mb-5">
           <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-            Family Member DOD
+            Does this family member have a spouse?
           </label>
-          <input
-            type="date"
-            id="memberDod"
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            required
-          />
+          <div className="flex items-center mb-4">
+            <input
+              type="radio"
+              name="hasSpouse"
+              value="yes"
+              checked={formData.hasSpouse}
+              onChange={() => setFormData({ ...formData, hasSpouse: true })}
+              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+            />
+            <label className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+              Yes
+            </label>
+          </div>
+          <div className="flex items-center mb-4">
+            <input
+              type="radio"
+              name="hasSpouse"
+              value="no"
+              checked={!formData.hasSpouse}
+              onChange={() => setFormData({ ...formData, hasSpouse: false })}
+              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+            />
+            <label className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+              No
+            </label>
+          </div>
         </div>
+        \{" "}
+        {formData.hasSpouse && (
+          <>
+            <div className="mb-5">
+              <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                Spouse Name
+              </label>
+              <input
+                type="text"
+                name="spouseName"
+                value={formData.spouseName}
+                onChange={handleChange}
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                required
+              />
+            </div>
 
+            <div className="mb-5">
+              <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                Spouse DOB
+              </label>
+              <input
+                type="date"
+                name="spouseDob"
+                value={formData.spouseDob}
+                onChange={handleChange}
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                required
+              />
+            </div>
+
+            <div className="mb-5">
+              <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                Spouse DOD (optional)
+              </label>
+              <input
+                type="date"
+                name="spouseDod"
+                value={formData.spouseDod}
+                onChange={handleChange}
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              />
+            </div>
+          </>
+        )}
         <button
           type="submit"
-          className="text-gray-800 bg-[#ffe928] hover:bg-[#ffd700] focus:ring-4 focus:outline-none focus:ring-[#ffe928] font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-[#ffe928] dark:hover:bg-[#ffd700] dark:focus:ring-[#ffe928]"
+          className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
         >
           Submit
         </button>

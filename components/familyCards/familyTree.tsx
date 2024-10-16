@@ -1,9 +1,9 @@
 "use client";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FamilyCard } from "./familyCard";
-import Xarrow,{ Xwrapper } from "react-xarrows";
+import Xarrow, { Xwrapper } from "react-xarrows";
 
-interface FamilyMember {
+export interface FamilyMember {
   id: string;
   firstName: string;
   lastName: string;
@@ -27,14 +27,15 @@ export const FamilyTree: React.FC = () => {
     id: "1",
     firstName: "Manuel",
     lastName: "Santos",
+
     relation: "Parent",
-    dob: "1980-01-01",
+    dob: "01/01/1980",
     dod: "",
     spouse: {
       firstName: "Isabella",
       lastName: "Santos",
       relation: "Spouse",
-      dob: "1982-02-14",
+      dob: "02/14/1982",
       dod: "",
     },
     children: [
@@ -43,13 +44,13 @@ export const FamilyTree: React.FC = () => {
         firstName: "Diego",
         lastName: "Santos",
         relation: "Child",
-        dob: "2005-06-15",
+        dob: "06/15/2005",
         dod: "",
         spouse: {
           firstName: "Camila",
           lastName: "Gomez",
           relation: "Spouse",
-          dob: "2006-07-20",
+          dob: "07/20/2006",
           dod: "",
         },
         children: [
@@ -58,7 +59,7 @@ export const FamilyTree: React.FC = () => {
             firstName: "Sofia",
             lastName: "Santos",
             relation: "Grandchild",
-            dob: "2020-01-10",
+            dob: "01/10/2020",
             dod: "",
             children: [],
           },
@@ -67,7 +68,7 @@ export const FamilyTree: React.FC = () => {
             firstName: "Mateo",
             lastName: "Santos",
             relation: "Grandchild",
-            dob: "2020-02-20",
+            dob: "02/20/2020",
             dod: "",
             children: [],
           },
@@ -76,7 +77,7 @@ export const FamilyTree: React.FC = () => {
             firstName: "Valentina",
             lastName: "Santos",
             relation: "Grandchild",
-            dob: "2020-03-30",
+            dob: "03/30/2020",
             dod: "",
             children: [],
           },
@@ -87,13 +88,13 @@ export const FamilyTree: React.FC = () => {
         firstName: "Alejandro",
         lastName: "Santos",
         relation: "Child",
-        dob: "2007-08-05",
+        dob: "08/05/2007",
         dod: "",
         spouse: {
           firstName: "Lucia",
           lastName: "Lopez",
           relation: "Spouse",
-          dob: "2008-09-10",
+          dob: "09/10/2008",
           dod: "",
         },
         children: [],
@@ -103,7 +104,7 @@ export const FamilyTree: React.FC = () => {
         firstName: "Carmen",
         lastName: "Santos",
         relation: "Child",
-        dob: "2010-09-12",
+        dob: "09/12/2010",
         dod: "",
         children: [
           {
@@ -111,7 +112,7 @@ export const FamilyTree: React.FC = () => {
             firstName: "Nicolas",
             lastName: "Santos",
             relation: "Grandchild",
-            dob: "2015-04-15",
+            dob: "04/15/2015",
             dod: "",
             children: [],
           },
@@ -120,16 +121,16 @@ export const FamilyTree: React.FC = () => {
             firstName: "Renata",
             lastName: "Santos",
             relation: "Grandchild",
-            dob: "2016-05-25",
+            dob: "05/25/2016",
             dod: "",
             children: [],
           },
           {
             id: "6",
-            firstName: "Diego",
+            firstName: "Alejandro",
             lastName: "Santos",
             relation: "Grandchild",
-            dob: "2017-06-30",
+            dob: "06/30/2017",
             dod: "",
             children: [],
           },
@@ -137,9 +138,8 @@ export const FamilyTree: React.FC = () => {
       },
     ],
   });
-   const refs: { [key: string]: React.RefObject<HTMLDivElement> } = {};
-  const [, setRender] = useState({});
-  const forceRerender = () => setRender({});
+  const refs: { [key: string]: React.RefObject<HTMLDivElement> } = {};
+
   const handleDrop = (droppedId: string, onId: string) => {
     const updatedMembers = updateFamilyTree(familyMembers, droppedId, onId);
 
@@ -196,12 +196,12 @@ export const FamilyTree: React.FC = () => {
     }
     return null;
   };
- const getOrCreateRef = (id: string) => {
-   if (!refs[id]) refs[id] = useRef<HTMLDivElement>(null);
-   return refs[id];
- };
+  const getOrCreateRef = (id: string) => {
+    if (!refs[id]) refs[id] = useRef<HTMLDivElement>(null);
+    return refs[id];
+  };
   const renderFamilyTree = (member: FamilyMember) => {
-   const parentRef = getOrCreateRef(member.id);
+    const parentRef = getOrCreateRef(member.id);
     return (
       <div
         key={member.id}
@@ -211,7 +211,7 @@ export const FamilyTree: React.FC = () => {
           flexDirection: "column",
           alignItems: "center",
           margin: "20px",
-          position:"relative"
+          position: "relative",
         }}
       >
         <div
