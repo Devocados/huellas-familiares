@@ -211,12 +211,12 @@ export const FamilyTree: React.FC = () => {
     }
     return null;
   };
-  const getOrCreateRef = (id: string) => {
+  const useOrCreateRef = (id: string) => {
     if (!refs[id]) refs[id] = useRef<HTMLDivElement>(null);
     return refs[id];
   };
   const renderFamilyTree = (member: FamilyMember) => {
-    const parentRef = getOrCreateRef(member.id);
+    const parentRef = useOrCreateRef(member.id);
     return (
       <div
         key={member.id}
@@ -255,7 +255,7 @@ export const FamilyTree: React.FC = () => {
             }}
           >
             {member.children.map((child) => {
-              const childRef = getOrCreateRef(child.id);
+              const childRef = useOrCreateRef(child.id);
               return (
                 <div key={child.id} style={{ position: "relative" }}>
                   {renderFamilyTree(child)}
