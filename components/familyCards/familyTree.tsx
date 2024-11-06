@@ -141,9 +141,24 @@ export const FamilyTree: React.FC = () => {
   const refs: { [key: string]: React.RefObject<HTMLDivElement> } = {};
 
   const handleDrop = (droppedId: string, onId: string) => {
+    if (isDescendant(droppedId, onId)) {
+  
+      return;
+    }
     const updatedMembers = updateFamilyTree(familyMembers, droppedId, onId);
 
     setFamilyMembers(updatedMembers);
+  };
+  const isDescendant = (parentId: string, id: string): boolean => {
+    const targetMember = findMember(familyMembers, parentId);
+    const checkDescendant = (member: FamilyMember): boolean => {
+      if (member.id === id) return true;
+      for (const child of member.children || []) {
+        if (checkDescendant(child)) return true;
+      }
+      return false;
+    };
+    return targetMember ? checkDescendant(targetMember) : false;
   };
 
   const updateFamilyTree = (
