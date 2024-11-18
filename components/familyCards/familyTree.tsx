@@ -139,7 +139,15 @@ export const FamilyTree: React.FC = () => {
     ],
   });
 
-  const refs: { [key: string]: React.RefObject<HTMLDivElement> } = {};
+  const refs = useRef<{ [key: string]: React.RefObject<HTMLDivElement> }>({});
+
+  useEffect(() => {
+    const populateRefs = (member: FamilyMember) => {
+      refs.current[member.id] = refs.current[member.id] || React.createRef();
+      member.children.forEach(populateRefs);
+    };
+    populateRefs(familyMembers);
+  }, [familyMembers]);
 
   const handleDrop = (droppedId: string, onId: string) => {
     if (isDescendant(droppedId, onId)) {
@@ -178,7 +186,7 @@ export const FamilyTree: React.FC = () => {
           (child) => child.id !== droppedId
         );
       }
-       const updatedDroppedMember = { ...droppedMember };
+      const updatedDroppedMember = { ...droppedMember };
 
       targetMember.children = [
         ...(targetMember.children || []),
@@ -212,13 +220,8 @@ export const FamilyTree: React.FC = () => {
     return null;
   };
 
-  const useOrCreateRef = (id: string) => {
-    if (!refs[id]) refs[id] = useRef<HTMLDivElement>(null);
-    return refs[id];
-  };
-
   const renderFamilyTree = (member: FamilyMember) => {
-    const parentRef = useOrCreateRef(member.id);
+    const parentRef = refs.current[member.id];
     return (
       <div
         key={member.id}
